@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import html2pdf from 'html2pdf.js';
 import { 
   FileText, 
   Briefcase, 
@@ -185,9 +186,537 @@ const VEILLE_ITEMS: VeilleItem[] = [
 
 // --- Components ---
 
+const TableauModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  if (!isOpen) return null;
+
+  const handleDownloadPDF = () => {
+    const element = document.getElementById('tableau-content');
+    if (element) {
+      const opt = {
+        margin: 10,
+        filename: 'Tableau_de_Synthese_Samuella_Bango_Ekaka.pdf',
+        image: { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'landscape' as const }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+  };
+
+  const competencyCategories = [
+    {
+      title: "Gérer le patrimoine informatique",
+      items: [
+        "Recenser et identifier les ressources numériques",
+        "Exploiter des référentiels, normes et standards adoptés par le prestataire informatique",
+        "Mettre en place et vérifier les niveaux d'habilitation associés à un service",
+        "Vérifier les conditions de la continuité d'un service informatique",
+        "Gérer des sauvegardes",
+        "Vérifier le respect des règles d'utilisation des ressources"
+      ]
+    },
+    {
+      title: "Répondre aux incidents et aux demandes d'assistance et d'évolution",
+      items: [
+        "Collecter, suivre et orienter des demandes",
+        "Traiter des demandes concernant les services réseau et système, applicatifs",
+        "Traiter des demandes concernant les applications"
+      ]
+    },
+    {
+      title: "Développer la présence en ligne de l'organisation",
+      items: [
+        "Participer à la valorisation de l'image de l'organisation sur les médias numériques en tenant compte du cadre juridique et des enjeux économiques",
+        "Référencer les services en ligne de l'organisation et mesurer leur visibilité",
+        "Participer à l'évolution d'un site Web exploitant les données de l'organisation"
+      ]
+    },
+    {
+      title: "Travailler en mode projet",
+      items: [
+        "Analyser les objectifs et les modalités d'organisation d'un projet",
+        "Planifier les activités",
+        "Évaluer les indicateurs de suivi d'un projet et analyser les écarts"
+      ]
+    },
+    {
+      title: "Mettre à disposition des utilisateurs un service informatique",
+      items: [
+        "Réaliser les tests d'intégration et d'acceptation d'un service",
+        "Déployer un service",
+        "Accompagner les utilisateurs dans la mise en place d'un service"
+      ]
+    },
+    {
+      title: "Organiser son développement professionnel",
+      items: [
+        "Mettre en place son environnement d'apprentissage personnel",
+        "Mettre en œuvre des outils et stratégies de veille informationnelle",
+        "Gérer son identité professionnelle",
+        "Développer son projet professionnel"
+      ]
+    }
+  ];
+
+  const missionCompetencyMap: Record<number, number[]> = {
+    1: [0, 4], // AD: Patrimoine, Service
+    2: [0, 4], // DNS/DHCP: Patrimoine, Service
+    3: [2],    // Cloudflare: Présence en ligne
+    4: [0],    // FTTH: Patrimoine
+    5: [1, 4], // SIEM: Incidents, Service
+    6: [2, 3]  // Entreprise: Présence, Projet
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-white/95 backdrop-blur-md"
+      />
+      
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        className="relative w-full max-w-[1200px] max-h-[95vh] overflow-y-auto bg-white border border-black rounded-sm shadow-2xl text-black font-sans p-4 md:p-8"
+      >
+        <div className="absolute top-4 right-4 flex gap-2 z-20 print:hidden">
+          <button 
+            onClick={handleDownloadPDF}
+            className="p-2 rounded-full bg-black/5 hover:bg-black/10 text-black transition-all"
+            title="Télécharger en PDF"
+          >
+            <Download size={20} />
+          </button>
+          <button 
+            onClick={onClose}
+            className="p-2 rounded-full bg-black/5 hover:bg-black/10 text-black transition-all"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="border-2 border-black p-4" id="tableau-content">
+          {/* Header Section */}
+          <div className="flex justify-between items-center border-b-2 border-black pb-2 mb-4">
+            <h1 className="text-lg font-bold">BTS SERVICES INFORMATIQUES AUX ORGANISATIONS</h1>
+            <h1 className="text-lg font-bold">SESSION 2026</h1>
+          </div>
+          
+          <h2 className="text-center text-xl font-bold mb-6">Tableau de synthèse des réalisations professionnelles</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 mb-4 text-sm">
+            <div className="flex border-b border-black pb-1">
+              <span className="font-bold mr-2">NOM et prénom :</span>
+              <span>BANGO EKAKA Samuella Erdy</span>
+            </div>
+            <div className="flex border-b border-black pb-1">
+              <span className="font-bold mr-2">N° candidat :</span>
+              <span></span>
+            </div>
+            <div className="flex border-b border-black pb-1">
+              <span className="font-bold mr-2">Centre de formation :</span>
+              <span>IPSSI SQY</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="font-bold">Option :</span>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 border border-black flex items-center justify-center">
+                  <div className="w-2 h-2 bg-black" />
+                </div>
+                <span>SISR</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 border border-black" />
+                <span>SLAM</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex border-b border-black pb-1 mb-6 text-sm">
+            <span className="font-bold mr-2">Adresse URL du portfolio :</span>
+            <span className="text-blue-600 underline">https://ais-pre-doij2vswlfnwthphbrjzs3-210071695259.europe-west2.run.app</span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-black text-[9px] leading-tight">
+              <thead>
+                <tr>
+                  <th rowSpan={2} className="border border-black p-2 text-center align-middle w-1/4">
+                    Réalisations professionnelles<br/>
+                    <span className="font-normal italic">(intitulé et liste des documents et productions associés)</span>
+                  </th>
+                  <th rowSpan={2} className="border border-black p-2 text-center align-middle w-16">
+                    Période<br/>
+                    <span className="font-normal italic">(JJ/MM/AA au JJ/MM/AA)</span>
+                  </th>
+                  <th colSpan={6} className="border border-black p-1 text-center font-bold">Compétences mises en œuvre</th>
+                </tr>
+                <tr>
+                  {competencyCategories.map((cat, i) => (
+                    <th key={i} className="border border-black p-1 text-[8px] align-top w-24">
+                      <p className="font-bold mb-1 text-center">{cat.title}</p>
+                      <ul className="list-none p-0 m-0 text-left">
+                        {cat.items.map((item, j) => (
+                          <li key={j} className="mb-1 flex gap-1">
+                            <span>▸</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="bg-gray-100">
+                  <td colSpan={8} className="border border-black p-1 font-bold text-center uppercase">Réalisation en cours de formation</td>
+                </tr>
+                {MISSIONS.filter(m => m.context === 'École').map(m => (
+                  <tr key={m.id}>
+                    <td className="border border-black p-2 font-medium">{m.title}</td>
+                    <td className="border border-black p-2 text-center">{m.date.split(' ').pop()}</td>
+                    {competencyCategories.map((_, i) => (
+                      <td key={i} className="border border-black p-1 text-center align-middle">
+                        {missionCompetencyMap[m.id]?.includes(i) && (
+                          <span className="text-xs font-bold">X</span>
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+                {/* Empty rows for visual fidelity */}
+                {[1, 2, 3].map(i => (
+                  <tr key={`empty-school-${i}`} className="h-6">
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                  </tr>
+                ))}
+
+                <tr className="bg-gray-100">
+                  <td colSpan={8} className="border border-black p-1 font-bold text-center uppercase">Réalisations en milieu professionnel en cours de première année</td>
+                </tr>
+                {MISSIONS.filter(m => m.context === 'Professionnel' && m.date.includes('2025')).map(m => (
+                  <tr key={m.id}>
+                    <td className="border border-black p-2 font-medium">{m.title}</td>
+                    <td className="border border-black p-2 text-center">{m.date.split(' ').pop()}</td>
+                    {competencyCategories.map((_, i) => (
+                      <td key={i} className="border border-black p-1 text-center align-middle">
+                        {missionCompetencyMap[m.id]?.includes(i) && (
+                          <span className="text-xs font-bold">X</span>
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+                {[1, 2, 3].map(i => (
+                  <tr key={`empty-pro1-${i}`} className="h-6">
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                  </tr>
+                ))}
+
+                <tr className="bg-gray-100">
+                  <td colSpan={8} className="border border-black p-1 font-bold text-center uppercase">Réalisations en milieu professionnel en cours de seconde année</td>
+                </tr>
+                {[1, 2, 3, 4, 5].map(i => (
+                  <tr key={`empty-pro2-${i}`} className="h-6">
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                    <td className="border border-black p-1"></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+const CVModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  if (!isOpen) return null;
+
+  const SkillDot = ({ level }: { level: number }) => (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <div 
+          key={i} 
+          className={`w-2.5 h-2.5 rounded-full ${i <= level ? 'bg-[#ff9800]' : 'bg-white/20'}`} 
+        />
+      ))}
+    </div>
+  );
+
+  const handleDownloadPDF = () => {
+    const element = document.getElementById('cv-content');
+    if (element) {
+      const opt = {
+        margin: 0,
+        filename: 'CV_Samuella_Bango_Ekaka.pdf',
+        image: { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#050a14' },
+        jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-[#050a14]/95 backdrop-blur-md"
+      />
+      
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        className="relative w-full max-w-5xl max-h-[95vh] overflow-y-auto bg-[#050a14] border border-white/10 rounded-lg shadow-2xl text-white font-sans"
+      >
+        <div className="absolute top-4 right-4 flex gap-2 z-20">
+          <button 
+            onClick={handleDownloadPDF}
+            className="p-2 rounded-full bg-brand-primary/10 hover:bg-brand-primary/20 text-brand-primary transition-all"
+            title="Télécharger en PDF"
+          >
+            <Download size={20} />
+          </button>
+          <button 
+            onClick={onClose}
+            className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="p-8 md:p-12" id="cv-content">
+          {/* Header Section */}
+          <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-12">
+            <div className="flex-grow">
+              <h2 className="text-4xl font-bold mb-1">
+                Samuella Erdy <span className="text-[#c6ff00]">BANGO EKAKA</span>
+              </h2>
+              <p className="text-2xl font-bold mb-6 tracking-wide">INGÉNIEURE SYSTÈMES ET RÉSEAUX</p>
+              
+              <div className="flex flex-wrap gap-3 mb-6">
+                {['Determiné', 'rigoureuse', 'active'].map((tag) => (
+                  <span key={tag} className="px-3 py-1 bg-[#c6ff00] text-black text-sm font-bold rounded-sm">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap gap-6 text-sm">
+                <div className="flex items-center gap-2"><Mail size={16} /> ekakasamuella@gmail.com</div>
+                <div className="flex items-center gap-2"><Phone size={16} /> 0758096637</div>
+                <div className="flex items-center gap-2"><MapPin size={16} /> 78990 Elancourt France</div>
+              </div>
+            </div>
+            
+            <div className="flex flex-col items-end">
+              <div className="text-[#c6ff00] font-black text-4xl mb-1">.IPSSI</div>
+              <div className="text-[#c6ff00] text-[10px] font-bold tracking-widest">_hack your limits</div>
+            </div>
+          </div>
+
+          {/* Objective Banner */}
+          <div className="bg-[#0d1526] border-y border-white/5 py-4 px-8 -mx-8 md:-mx-12 mb-12">
+            <p className="text-[#c6ff00] text-sm font-medium">
+              Recherche d'un stage non rémunéré, du 27 avril au 26 juin 2026.<br />
+              Et d'une alternance à partir de septembre 2026
+            </p>
+          </div>
+
+          {/* Main Content Grid */}
+          <div className="grid md:grid-cols-2 gap-16">
+            {/* Left Column: Expériences & Formations */}
+            <div className="space-y-16">
+              {/* Expériences */}
+              <section>
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="p-1.5 rounded-full border-2 border-[#c6ff00] text-[#c6ff00]"><Briefcase size={18} /></div>
+                  <h3 className="text-2xl font-bold uppercase tracking-tight">Expériences</h3>
+                </div>
+                
+                <div className="space-y-10">
+                  <div>
+                    <h4 className="text-xl font-bold mb-1">Technicien système réseaux</h4>
+                    <p className="font-bold text-sm mb-4">IPSS SQY- Projet pédagogique - Depuis novembre 2025</p>
+                    <ul className="text-sm text-gray-300 space-y-2 list-none">
+                      <li className="flex gap-2"><span className="text-[#c6ff00]">•</span> <span>Mise en place d'une infrastructure complète :</span></li>
+                      <li className="pl-6 text-gray-400">La gestion d'annuaire [Active Directory],</li>
+                      <li className="pl-6 text-gray-400">Les services réseaux [DNS/DHCP],</li>
+                      <li className="pl-6 text-gray-400">La supervision [SIEM/EDR]</li>
+                      <li className="pl-6 text-gray-400">L'inventaire de parc.</li>
+                      <li className="flex gap-2"><span className="text-[#c6ff00]">•</span> <span>Préparation de l'hébergement du site web via Cloudflare Pages</span></li>
+                      <li className="flex gap-2"><span className="text-[#c6ff00]">•</span> <span>Création d'une entreprise fictive et d'un site web avec HTML/CSS</span></li>
+                      <li className="flex gap-2"><span className="text-[#c6ff00]">•</span> <span>Elaboration business plan</span></li>
+                      <li className="flex gap-2"><span className="text-[#c6ff00]">•</span> <span>Utilisation de l'IDE pour la création de Site web</span></li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xl font-bold mb-1">Stagiaire en Installation du réseau FTTH</h4>
+                    <p className="font-bold text-sm mb-4">SITCOM OPTIQUE - Octobre 2025 à novembre 2025 - Stage - Brazzaville - Congo</p>
+                    <ul className="text-sm text-gray-300 space-y-2 list-none">
+                      <li className="flex gap-2"><span className="text-[#c6ff00]">•</span> <span>Installation d'un réseau FTTH</span></li>
+                      <li className="flex gap-2"><span className="text-[#c6ff00]">•</span> <span>câblage du point de branchement optique (PBO)jusqu'à l'abonner</span></li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+
+              {/* Formations */}
+              <section>
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="p-1.5 rounded-full border-2 border-[#c6ff00] text-[#c6ff00]"><GraduationCap size={18} /></div>
+                  <h3 className="text-2xl font-bold uppercase tracking-tight">Formations</h3>
+                </div>
+                <div className="space-y-8">
+                  <div>
+                    <h4 className="text-xl font-bold mb-1">BTS SIO Option SISR</h4>
+                    <p className="text-sm text-gray-300">IPSSI SQY - Grande Ecole d'Informatique | Depuis 2025</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold mb-1">Baccalauréat General</h4>
+                    <p className="text-sm text-gray-300">Anne Marie Javouhey | 2020 à 2021</p>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            {/* Right Column: Compétences & Centres d'intérêt */}
+            <div className="space-y-16">
+              {/* Compétences */}
+              <section>
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="p-1.5 rounded-full border-2 border-[#c6ff00] text-[#c6ff00]"><Monitor size={18} /></div>
+                  <h3 className="text-2xl font-bold uppercase tracking-tight">Compétences</h3>
+                </div>
+                
+                <div className="space-y-10">
+                  <div>
+                    <h4 className="text-lg font-bold mb-4">Sécurité, réseaux et télécom</h4>
+                    <div className="space-y-3">
+                      {[
+                        { name: 'DHCP', lvl: 4 },
+                        { name: 'VirtualBox', lvl: 4 },
+                        { name: 'Cisco', lvl: 4 },
+                        { name: 'Windows Server 2019', lvl: 4 },
+                        { name: 'Active directory', lvl: 4 },
+                        { name: 'Firewall', lvl: 4 },
+                        { name: 'VPN', lvl: 4 },
+                        { name: 'VoIP', lvl: 4 },
+                        { name: 'Ubuntu', lvl: 3 }
+                      ].map(s => (
+                        <div key={s.name} className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[#c6ff00] text-lg">•</span>
+                            <span className="text-sm text-gray-200">{s.name}</span>
+                          </div>
+                          <SkillDot level={s.lvl} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-bold mb-4">Dév. fullstack et mobile</h4>
+                    <div className="space-y-3">
+                      {[
+                        { name: 'HTML5 / CSS3', lvl: 2 },
+                        { name: 'VisualBasic', lvl: 2 }
+                      ].map(s => (
+                        <div key={s.name} className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[#c6ff00] text-lg">•</span>
+                            <span className="text-sm text-gray-200">{s.name}</span>
+                          </div>
+                          <SkillDot level={s.lvl} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-bold mb-4">Webmarketing</h4>
+                    <div className="space-y-3">
+                      {[
+                        { name: 'Canva', lvl: 4 }
+                      ].map(s => (
+                        <div key={s.name} className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[#c6ff00] text-lg">•</span>
+                            <span className="text-sm text-gray-200">{s.name}</span>
+                          </div>
+                          <SkillDot level={s.lvl} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Centres d'intérêt */}
+              <section>
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="p-1.5 rounded-full border-2 border-[#c6ff00] text-[#c6ff00]"><ShieldCheck size={18} /></div>
+                  <h3 className="text-2xl font-bold uppercase tracking-tight">Centres d'intérêt</h3>
+                </div>
+                <div className="space-y-8">
+                  <div>
+                    <h4 className="text-lg font-bold mb-3">Lecture</h4>
+                    <ul className="text-sm text-gray-300 space-y-1">
+                      <li className="flex gap-2"><span className="text-[#c6ff00]">•</span> Lecture de romans</li>
+                      <li className="flex gap-2"><span className="text-[#c6ff00]">•</span> Manga(Manhwa)</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold mb-3">Cinéma</h4>
+                    <ul className="text-sm text-gray-300 space-y-1">
+                      <li className="flex gap-2"><span className="text-[#c6ff00]">•</span> Drama (K-drama, C-drama)</li>
+                      <li className="flex gap-2"><span className="text-[#c6ff00]">•</span> Documentaire culturelle et historique</li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
-  const [isLight, setIsLight] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -196,8 +725,8 @@ const Navbar = () => {
   }, []);
 
   const toggleTheme = () => {
-    setIsLight(!isLight);
-    document.documentElement.classList.toggle('light');
+    setIsDark(!isDark);
+    document.documentElement.classList.toggle('dark');
   };
 
   return (
@@ -219,7 +748,7 @@ const Navbar = () => {
             className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-brand-primary transition-all border border-white/10"
             title="Changer le thème"
           >
-            {isLight ? <Moon size={18} /> : <Sun size={18} />}
+            {isDark ? <Sun size={18} /> : <Moon size={18} />}
           </button>
         </div>
 
@@ -228,7 +757,7 @@ const Navbar = () => {
           onClick={toggleTheme}
           className="md:hidden p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-brand-primary transition-all border border-white/10"
         >
-          {isLight ? <Moon size={18} /> : <Sun size={18} />}
+          {isDark ? <Sun size={18} /> : <Moon size={18} />}
         </button>
       </div>
     </nav>
@@ -265,13 +794,13 @@ const Hero = () => {
             href="https://drive.google.com/file/d/1-7r1xrvF7ha3P5rhp98aReiRHZ5Kgbij/preview" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="px-8 py-3 rounded-xl bg-brand-primary text-brand-bg font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-primary/20"
+            className="px-8 py-3 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-lg shadow-black/20"
           >
             <Eye size={18} /> Aperçu CV
           </a>
           <a 
             href="https://drive.google.com/uc?export=download&id=1-7r1xrvF7ha3P5rhp98aReiRHZ5Kgbij"
-            className="px-8 py-3 rounded-xl border border-white/10 bg-white/5 text-white font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+            className="px-8 py-3 rounded-xl border border-slate-800 bg-slate-900/50 text-white font-bold hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
           >
             <Download size={18} /> Télécharger CV
           </a>
@@ -357,6 +886,8 @@ const Competences = () => {
 };
 
 const Documents = () => {
+  const [isCVOpen, setIsCVOpen] = useState(false);
+
   return (
     <section id="documents" className="py-24 px-6 bg-brand-bg/50">
       <div className="max-w-7xl mx-auto">
@@ -377,13 +908,13 @@ const Documents = () => {
                 href="https://drive.google.com/file/d/1-7r1xrvF7ha3P5rhp98aReiRHZ5Kgbij/preview" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex-1 py-2 rounded-lg border border-brand-primary/30 text-brand-primary text-sm font-medium hover:bg-brand-primary/5 flex items-center justify-center gap-2"
+                className="flex-1 py-2 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 flex items-center justify-center gap-2 transition-colors"
               >
                 <Eye size={16} /> Aperçu
               </a>
               <a 
                 href="https://drive.google.com/uc?export=download&id=1-7r1xrvF7ha3P5rhp98aReiRHZ5Kgbij"
-                className="flex-1 py-2 rounded-lg bg-brand-primary/10 text-brand-primary text-sm font-medium hover:bg-brand-primary/20 flex items-center justify-center gap-2"
+                className="flex-1 py-2 rounded-lg border border-slate-800 text-slate-900 text-sm font-medium hover:bg-slate-100 flex items-center justify-center gap-2 transition-colors dark:text-white dark:hover:bg-white/5"
               >
                 <Download size={16} /> Télécharger
               </a>
@@ -393,6 +924,7 @@ const Documents = () => {
       </div>
 
       <AnimatePresence>
+        {isCVOpen && <CVModal isOpen={isCVOpen} onClose={() => setIsCVOpen(false)} />}
       </AnimatePresence>
     </section>
   );
@@ -401,6 +933,7 @@ const Documents = () => {
 const RealisationsProfessionnelles = () => {
   const [filterContext, setFilterContext] = useState('Tous');
   const [filterComp, setFilterComp] = useState('Toutes');
+  const [isTableauOpen, setIsTableauOpen] = useState(false);
 
   const filteredMissions = MISSIONS.filter(m => {
     const matchContext = filterContext === 'Tous' || m.context === filterContext;
@@ -501,20 +1034,34 @@ const RealisationsProfessionnelles = () => {
                   Consultez le tableau récapitulatif de mes compétences acquises au cours de ma formation BTS SIO.
                 </p>
                 <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                  <a 
-                    href="https://drive.google.com/file/d/1DRn0aSnAZPr_G-ecZ75w9zi8vNcDcZGr/preview" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
+                  <button 
+                    onClick={() => setIsTableauOpen(true)}
                     className="px-6 py-2.5 rounded-lg border border-brand-primary/30 text-brand-primary text-sm font-medium hover:bg-brand-primary/5 flex items-center gap-2"
                   >
                     <Eye size={18} /> Aperçu
-                  </a>
-                  <a 
-                    href="https://drive.google.com/uc?export=download&id=1DRn0aSnAZPr_G-ecZ75w9zi8vNcDcZGr"
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setIsTableauOpen(true);
+                      // Attendre que le modal soit ouvert et rendu
+                      setTimeout(() => {
+                        const element = document.getElementById('tableau-content');
+                        if (element) {
+                          const opt = {
+                            margin: 10,
+                            filename: 'Tableau_de_Synthese_Samuella_Bango_Ekaka.pdf',
+                            image: { type: 'jpeg' as const, quality: 0.98 },
+                            html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                            jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'landscape' as const }
+                          };
+                          html2pdf().set(opt).from(element).save();
+                        }
+                      }, 1000);
+                    }}
                     className="px-6 py-2.5 rounded-lg bg-brand-primary/10 text-brand-primary text-sm font-medium hover:bg-brand-primary/20 flex items-center gap-2"
                   >
                     <Download size={18} /> Télécharger
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
@@ -523,6 +1070,7 @@ const RealisationsProfessionnelles = () => {
       </div>
 
       <AnimatePresence>
+        {isTableauOpen && <TableauModal isOpen={isTableauOpen} onClose={() => setIsTableauOpen(false)} />}
       </AnimatePresence>
     </section>
   );
