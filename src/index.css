@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-bg: var(--brand-bg);
+  --color-brand-card: var(--brand-card);
+  --color-brand-text: var(--brand-text);
+  --color-brand-text-muted: var(--brand-text-muted);
+  --color-brand-border: var(--brand-border);
+  --color-brand-primary: #10b981; /* Emerald */
+  --color-brand-secondary: #3b82f6; /* Blue */
+  --color-brand-accent: #f59e0b; /* Amber */
+  
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --brand-bg: #f8fafc;
+  --brand-card: #ffffff;
+  --brand-text: #0f172a;
+  --brand-text-muted: #64748b;
+  --brand-border: #e2e8f0;
+}
+
+.dark {
+  --brand-bg: #0f172a;
+  --brand-card: #1e293b;
+  --brand-text: #f8fafc;
+  --brand-text-muted: #94a3b8;
+  --brand-border: #334155;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-bg text-brand-text selection:bg-brand-primary/30 font-sans;
+    color: var(--brand-text);
+    scroll-behavior: smooth;
+  }
+}
+
+.glass-card {
+  @apply bg-brand-card border border-brand-border rounded-2xl shadow-sm;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  @apply shadow-xl border-brand-primary/30;
+  transform: translateY(-4px);
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-primary to-brand-secondary font-bold;
+}
+
+.btn-primary {
+  @apply px-6 py-3 bg-brand-primary text-white font-bold hover:opacity-90 transition-all rounded-xl shadow-lg shadow-brand-primary/20;
+}
+
+.btn-outline {
+  @apply px-6 py-3 border border-brand-border text-brand-text font-medium hover:bg-brand-text/5 transition-all rounded-xl;
+}
+
+.section-title {
+  @apply text-4xl md:text-5xl font-extrabold mb-4 text-center tracking-tight;
+}
+
+.section-subtitle {
+  @apply text-brand-primary text-sm mb-12 text-center uppercase tracking-widest font-bold;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-brand-bg;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-brand-text/10 rounded-full hover:bg-brand-text/20 transition-colors;
+}
