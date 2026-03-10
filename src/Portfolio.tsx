@@ -28,7 +28,7 @@ import {
 interface Mission {
   id: number;
   title: string;
-  context: 'Professionnel' | 'École' | 'Personnel';
+  contexts: ('Professionnel' | 'École' | 'Personnel' | 'E6')[];
   date: string;
   description: string;
   competencies: string[];
@@ -56,7 +56,7 @@ const MISSIONS: Mission[] = [
   {
     id: 1,
     title: "Mise en place d'une infrastructure Active Directory",
-    context: 'École',
+    contexts: ['Professionnel', 'E6'],
     date: 'Octobre - Novembre 2025',
     description: "Gestion d'annuaire avec Active Directory : création et gestion des utilisateurs, groupes, unités d'organisation et stratégies de groupe (GPO).",
     competencies: ['Gérer le patrimoine informatique']
@@ -64,7 +64,7 @@ const MISSIONS: Mission[] = [
   {
     id: 2,
     title: "Configuration des services réseaux DNS/DHCP",
-    context: 'École',
+    contexts: ['École'],
     date: 'Novembre 2025',
     description: "Déploiement et configuration des services DNS et DHCP sur Windows Server pour la gestion automatique des adresses IP et la résolution de noms.",
     competencies: ['Gérer le patrimoine informatique']
@@ -72,7 +72,7 @@ const MISSIONS: Mission[] = [
   {
     id: 3,
     title: "Hébergement site web via Cloudflare Pages",
-    context: 'École',
+    contexts: ['École'],
     date: 'Décembre 2025',
     description: "Préparation et configuration de l'hébergement d'un site web en utilisant Cloudflare Pages pour le déploiement.",
     competencies: ['Développer la présence en ligne']
@@ -80,7 +80,7 @@ const MISSIONS: Mission[] = [
   {
     id: 4,
     title: "Installation réseau FTTH",
-    context: 'Professionnel',
+    contexts: ['Professionnel'],
     date: 'Octobre - Novembre 2025',
     description: "Stage chez SITCOM OPTIQUE à Brazzaville (Congo). Installation de réseau fibre optique FTTH : câblage du point de branchement optique (PBO) jusqu'à l'abonné.",
     competencies: ['Gérer le patrimoine informatique']
@@ -88,7 +88,7 @@ const MISSIONS: Mission[] = [
   {
     id: 5,
     title: "Mise en place de la supervision SIEM/EDR",
-    context: 'École',
+    contexts: ['École'],
     date: 'Novembre 2025',
     description: "Installation et configuration d'outils de supervision pour la détection des menaces et la réponse aux incidents de sécurité.",
     competencies: ['Répondre aux incidents', 'Mettre à disposition des utilisateurs un service informatique']
@@ -96,7 +96,7 @@ const MISSIONS: Mission[] = [
   {
     id: 6,
     title: "Création d'une entreprise fictive et site web",
-    context: 'École',
+    contexts: ['École'],
     date: 'Novembre 2025',
     description: "Création d'une entreprise fictive avec élaboration d'un business plan et développement d'un site web vitrine en ligne.",
     competencies: ['Travailler en mode projet']
@@ -403,12 +403,42 @@ const Documents = () => {
 };
 
 const RealisationsProfessionnelles = () => {
-  const [filterContext, setFilterContext] = useState('Tous');
-  const [filterComp, setFilterComp] = useState('Toutes');
+  const [filterContexts, setFilterContexts] = useState<string[]>(['Tous']);
+  const [filterComps, setFilterComps] = useState<string[]>(['Toutes']);
+
+  const toggleContext = (f: string) => {
+    if (f === 'Tous') {
+      setFilterContexts(['Tous']);
+      return;
+    }
+    setFilterContexts(prev => {
+      const next = prev.filter(v => v !== 'Tous');
+      if (next.includes(f)) {
+        const filtered = next.filter(v => v !== f);
+        return filtered.length === 0 ? ['Tous'] : filtered;
+      }
+      return [...next, f];
+    });
+  };
+
+  const toggleComp = (f: string) => {
+    if (f === 'Toutes') {
+      setFilterComps(['Toutes']);
+      return;
+    }
+    setFilterComps(prev => {
+      const next = prev.filter(v => v !== 'Toutes');
+      if (next.includes(f)) {
+        const filtered = next.filter(v => v !== f);
+        return filtered.length === 0 ? ['Toutes'] : filtered;
+      }
+      return [...next, f];
+    });
+  };
 
   const filteredMissions = MISSIONS.filter(m => {
-    const matchContext = filterContext === 'Tous' || m.context === filterContext;
-    const matchComp = filterComp === 'Toutes' || m.competencies.includes(filterComp);
+    const matchContext = filterContexts.includes('Tous') || m.contexts.some(c => filterContexts.includes(c));
+    const matchComp = filterComps.includes('Toutes') || m.competencies.some(c => filterComps.includes(c));
     return matchContext && matchComp;
   });
 
@@ -424,11 +454,11 @@ const RealisationsProfessionnelles = () => {
           <div>
             <p className="text-sm text-brand-text-muted mb-3">Filtrer par contexte :</p>
             <div className="flex flex-wrap gap-2">
-              {['Tous', 'Professionnel', 'École', 'Personnel'].map(f => (
+              {['Tous', 'Professionnel', 'École', 'Personnel', 'E6'].map(f => (
                 <button 
                   key={f}
-                  onClick={() => setFilterContext(f)}
-                  className={`px-4 py-1.5 rounded-lg text-sm transition-all ${filterContext === f ? 'bg-brand-primary text-brand-bg font-semibold' : 'bg-brand-text/5 text-brand-text-muted hover:bg-brand-text/10'}`}
+                  onClick={() => toggleContext(f)}
+                  className={`px-4 py-1.5 rounded-lg text-sm transition-all flex items-center gap-2 ${filterContexts.includes(f) ? 'bg-brand-primary text-brand-bg font-semibold' : 'bg-brand-text/5 text-brand-text-muted hover:bg-brand-text/10'}`}
                 >
                   {f}
                 </button>
@@ -442,8 +472,8 @@ const RealisationsProfessionnelles = () => {
               {['Toutes', 'Gérer le patrimoine informatique', 'Répondre aux incidents', 'Développer la présence en ligne', 'Travailler en mode projet'].map(f => (
                 <button 
                   key={f}
-                  onClick={() => setFilterComp(f)}
-                  className={`px-4 py-1.5 rounded-lg text-sm transition-all ${filterComp === f ? 'bg-brand-primary text-brand-bg font-semibold' : 'bg-brand-text/5 text-brand-text-muted hover:bg-brand-text/10'}`}
+                  onClick={() => toggleComp(f)}
+                  className={`px-4 py-1.5 rounded-lg text-sm transition-all ${filterComps.includes(f) ? 'bg-brand-primary text-brand-bg font-semibold' : 'bg-brand-text/5 text-brand-text-muted hover:bg-brand-text/10'}`}
                 >
                   {f}
                 </button>
@@ -464,13 +494,18 @@ const RealisationsProfessionnelles = () => {
                 className="glass-card p-6 flex flex-col"
               >
                 <div className="flex justify-between items-center mb-6">
-                  <span className={`px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider ${
-                    mission.context === 'École' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 
-                    mission.context === 'Professionnel' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 
-                    'bg-brand-text/5 text-brand-text-muted border border-brand-border/30'
-                  }`}>
-                    {mission.context}
-                  </span>
+                  <div className="flex gap-1.5">
+                    {mission.contexts.map((ctx, idx) => (
+                      <span key={idx} className={`px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider ${
+                        ctx === 'École' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 
+                        ctx === 'Professionnel' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 
+                        ctx === 'E6' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' :
+                        'bg-brand-text/5 text-brand-text-muted border border-brand-border/30'
+                      }`}>
+                        {ctx}
+                      </span>
+                    ))}
+                  </div>
                   <span className="text-[10px] text-brand-text-muted font-medium opacity-60">{mission.date}</span>
                 </div>
                 <h3 className="text-lg font-bold mb-3 leading-tight">{mission.title}</h3>
@@ -656,12 +691,15 @@ const Veille = () => {
 };
 
 const Parcours = () => {
+  const [selectedItem, setSelectedItem] = useState<null | typeof timelineItems[0]>(null);
+
   const timelineItems = [
     { 
       date: "2020 - 2021", 
       title: "Baccalauréat Général", 
       subtitle: "Anne Marie Javouhey",
       desc: "Obtention du Baccalauréat", 
+      details: "Spécialités suivies : Mathématiques et Physique-Chimie. Ce diplôme a marqué la fin de mon cycle secondaire avec une base solide en sciences.",
       side: 'left'
     },
     { 
@@ -669,6 +707,7 @@ const Parcours = () => {
       title: "Stage FTTH", 
       subtitle: "SITCOM OPTIQUE - Brazzaville, Congo",
       desc: "Installation réseau fibre optique", 
+      details: "Stage pratique en entreprise spécialisée dans les télécoms. Missions : tirage de câbles, soudure de fibre optique, installation de PBO et raccordement client final.",
       side: 'right'
     },
     { 
@@ -676,6 +715,7 @@ const Parcours = () => {
       title: "BTS SIO Option SISR", 
       subtitle: "IPSSI SQY",
       desc: "Formation en cours - Systèmes & Réseaux", 
+      details: "Apprentissage des fondamentaux de l'informatique : administration système (Windows/Linux), réseaux (Cisco), cybersécurité et développement de solutions logicielles.",
       side: 'left'
     },
     { 
@@ -683,6 +723,7 @@ const Parcours = () => {
       title: "Stage recherché", 
       subtitle: "Île-de-France",
       desc: "Stage de 2 mois en entreprise", 
+      details: "Recherche active d'un stage de fin de première année. Objectif : mettre en pratique mes compétences en administration système et réseau dans un environnement professionnel réel.",
       side: 'right'
     },
     { 
@@ -690,6 +731,7 @@ const Parcours = () => {
       title: "Alternance recherchée", 
       subtitle: "Île-de-France",
       desc: "Alternance pour la 2ème année", 
+      details: "Projet d'alternance pour la deuxième année du BTS SIO. Rythme souhaité : 1 semaine école / 2 semaines entreprise. Focus sur la cybersécurité et l'infrastructure.",
       side: 'left'
     }
   ];
@@ -699,7 +741,7 @@ const Parcours = () => {
       <div className="max-w-7xl mx-auto">
         <h2 className="section-title">Mon Parcours</h2>
         <p className="section-subtitle">
-          Mon évolution académique et mes premières expériences professionnelles
+          Mon évolution académique et mes premières expériences professionnelles (Cliquez pour plus de détails)
         </p>
         
         <div className="relative max-w-4xl mx-auto pl-8 md:pl-0 mt-16">
@@ -709,7 +751,8 @@ const Parcours = () => {
           {timelineItems.map((item, idx) => (
             <div 
               key={idx} 
-              className={`relative mb-12 md:w-1/2 group ${item.side === 'right' ? 'md:ml-auto md:pl-12' : 'md:pr-12 md:text-left'}`}
+              className={`relative mb-12 md:w-1/2 group cursor-pointer ${item.side === 'right' ? 'md:ml-auto md:pl-12' : 'md:pr-12 md:text-left'}`}
+              onClick={() => setSelectedItem(item)}
             >
               {/* Dot */}
               <div className="absolute left-0 md:left-auto md:right-0 top-2 w-4 h-4 rounded-full bg-brand-primary border-4 border-brand-bg translate-x-[-50%] md:translate-x-[50%] shadow-[0_0_10px_rgba(0,210,255,0.5)] group-hover:scale-125 transition-transform" />
@@ -725,6 +768,50 @@ const Parcours = () => {
         </div>
       </div>
 
+      {/* Detail Modal */}
+      <AnimatePresence>
+        {selectedItem && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedItem(null)}
+              className="absolute inset-0 bg-brand-bg/80 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-lg glass-card p-8 border-brand-primary/30"
+            >
+              <button 
+                onClick={() => setSelectedItem(null)}
+                className="absolute top-4 right-4 text-brand-text-muted hover:text-brand-primary transition-colors"
+              >
+                <X size={20} />
+              </button>
+              
+              <span className="text-xs font-bold text-brand-primary uppercase tracking-widest mb-2 block">{selectedItem.date}</span>
+              <h3 className="text-2xl font-bold mb-1">{selectedItem.title}</h3>
+              <p className="text-brand-text-muted text-sm mb-6 pb-6 border-b border-brand-border/30">{selectedItem.subtitle}</p>
+              
+              <div className="space-y-4">
+                <p className="text-brand-text leading-relaxed">
+                  {selectedItem.details}
+                </p>
+              </div>
+              
+              <button 
+                onClick={() => setSelectedItem(null)}
+                className="mt-8 w-full py-3 rounded-lg bg-brand-primary text-brand-bg font-bold hover:opacity-90 transition-opacity"
+              >
+                Fermer
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
