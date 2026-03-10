@@ -14,19 +14,19 @@
 }
 
 :root {
-  --brand-bg: #f8fafc;
-  --brand-card: #ffffff;
-  --brand-text: #0f172a;
-  --brand-text-muted: #64748b;
-  --brand-border: #e2e8f0;
-}
-
-.dark {
   --brand-bg: #0f172a;
   --brand-card: #1e293b;
   --brand-text: #f8fafc;
   --brand-text-muted: #94a3b8;
   --brand-border: #334155;
+}
+
+.light {
+  --brand-bg: #f8fafc;
+  --brand-card: #ffffff;
+  --brand-text: #0f172a;
+  --brand-text-muted: #64748b;
+  --brand-border: #e2e8f0;
 }
 
 @layer base {
