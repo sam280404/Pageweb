@@ -656,50 +656,41 @@ const Veille = () => {
 };
 
 const Parcours = () => {
-  const [selectedItem, setSelectedItem] = useState<any>(null);
-
   const timelineItems = [
     { 
       date: "2020 - 2021", 
       title: "Baccalauréat Général", 
-      desc: "Anne Marie Javouhey. Obtention du Baccalauréat.", 
-      side: 'left',
-      fullDesc: "Obtention du Baccalauréat Général au lycée Anne Marie Javouhey. Cette étape a marqué la fin de mes études secondaires et le début de mon orientation vers les technologies de l'information."
-    },
-    { 
-      date: "Depuis 2025", 
-      title: "BTS SIO Option SISR", 
-      desc: "IPSSI SQY. Formation en cours - Systèmes & Réseaux.", 
-      side: 'right',
-      fullDesc: "Actuellement en formation BTS Services Informatiques aux Organisations (SIO) option Solutions d'Infrastructure, Systèmes et Réseaux (SISR) à l'IPSSI SQY. Je me spécialise dans la gestion des infrastructures et la cybersécurité."
+      subtitle: "Anne Marie Javouhey",
+      desc: "Obtention du Baccalauréat", 
+      side: 'left'
     },
     { 
       date: "Oct - Nov 2025", 
       title: "Stage FTTH", 
-      desc: "SITCOM OPTIQUE - Brazzaville, Congo. Installation réseau fibre optique.", 
-      side: 'left',
-      fullDesc: "Stage pratique chez SITCOM OPTIQUE à Brazzaville. Participation à l'installation de réseaux fibre optique (FTTH), soudure de fibres, et configuration de terminaux clients."
+      subtitle: "SITCOM OPTIQUE - Brazzaville, Congo",
+      desc: "Installation réseau fibre optique", 
+      side: 'right'
     },
     { 
-      date: "Depuis Nov 2025", 
-      title: "Projet Pédagogique", 
-      desc: "IPSSI SQY. Technicien système réseaux - Infrastructure complète.", 
-      side: 'right',
-      fullDesc: "Mise en place d'une infrastructure réseau complète dans le cadre d'un projet pédagogique : configuration de serveurs Windows/Linux, gestion d'Active Directory, et sécurisation des accès."
+      date: "Depuis 2025", 
+      title: "BTS SIO Option SISR", 
+      subtitle: "IPSSI SQY",
+      desc: "Formation en cours - Systèmes & Réseaux", 
+      side: 'left'
     },
     { 
       date: "Avril - Juin 2026", 
       title: "Stage recherché", 
-      desc: "Île-de-France. Stage de 2 mois en entreprise.", 
-      side: 'left',
-      fullDesc: "Recherche active d'un stage de 2 mois (Avril à Juin 2026) en Île-de-France pour mettre en pratique mes compétences en administration systèmes et réseaux."
+      subtitle: "Île-de-France",
+      desc: "Stage de 2 mois en entreprise", 
+      side: 'right'
     },
     { 
       date: "Septembre 2026", 
       title: "Alternance recherchée", 
-      desc: "Île-de-France. Alternance pour la 2ème année.", 
-      side: 'right',
-      fullDesc: "Recherche d'une alternance pour ma deuxième année de BTS SIO SISR à partir de Septembre 2026, afin de poursuivre ma montée en compétences en milieu professionnel."
+      subtitle: "Île-de-France",
+      desc: "Alternance pour la 2ème année", 
+      side: 'left'
     }
   ];
 
@@ -718,14 +709,15 @@ const Parcours = () => {
           {timelineItems.map((item, idx) => (
             <div 
               key={idx} 
-              className={`relative mb-12 md:w-1/2 cursor-pointer group ${item.side === 'right' ? 'md:ml-auto md:pl-12' : 'md:pr-12 md:text-right'}`}
-              onClick={() => setSelectedItem(item)}
+              className={`relative mb-12 md:w-1/2 group ${item.side === 'right' ? 'md:ml-auto md:pl-12' : 'md:pr-12 md:text-left'}`}
             >
               {/* Dot */}
               <div className="absolute left-0 md:left-auto md:right-0 top-2 w-4 h-4 rounded-full bg-brand-primary border-4 border-brand-bg translate-x-[-50%] md:translate-x-[50%] shadow-[0_0_10px_rgba(0,210,255,0.5)] group-hover:scale-125 transition-transform" />
               
               <div className="glass-card p-6 group-hover:border-brand-primary/50 transition-all group-hover:bg-brand-text/5">
-                <h4 className="font-bold mb-2">{item.title}</h4>
+                <span className="text-sm font-bold text-brand-primary mb-1 block">{item.date}</span>
+                <h4 className="font-bold text-lg mb-1">{item.title}</h4>
+                <p className="text-brand-text-muted text-xs mb-2 opacity-80">{item.subtitle}</p>
                 <p className="text-brand-text-muted text-sm">{item.desc}</p>
               </div>
             </div>
@@ -733,56 +725,6 @@ const Parcours = () => {
         </div>
       </div>
 
-      <AnimatePresence>
-        {selectedItem && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedItem(null)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-lg glass-card p-8 overflow-hidden"
-            >
-              <button 
-                onClick={() => setSelectedItem(null)}
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/10 transition-colors"
-              >
-                <X size={20} />
-              </button>
-              
-              <div className="flex items-center gap-3 text-brand-primary mb-6">
-                <div className="w-10 h-10 rounded-xl bg-brand-primary/10 flex items-center justify-center">
-                  <Calendar size={20} />
-                </div>
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-wider opacity-70">Période</span>
-                  <p className="font-bold">{selectedItem.date}</p>
-                </div>
-              </div>
-              
-              <h3 className="text-2xl font-bold mb-4">{selectedItem.title}</h3>
-              <div className="w-12 h-1 bg-brand-primary mb-6 rounded-full" />
-              
-              <p className="text-gray-300 leading-relaxed mb-8">
-                {selectedItem.fullDesc}
-              </p>
-              
-              <button 
-                onClick={() => setSelectedItem(null)}
-                className="w-full py-3 rounded-xl bg-brand-primary text-brand-bg font-bold hover:opacity-90 transition-opacity"
-              >
-                Fermer
-              </button>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </section>
   );
 };
